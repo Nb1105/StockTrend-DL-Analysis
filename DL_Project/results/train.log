@@ -1,0 +1,27 @@
+1987 usable days 2008-08-11..2016-06-30, up-rate 0.535
+
+== market_only: train 1388 val 297 test 298; test up-rate 0.507
+  MLP          acc 0.487±0.013 P 0.494 R 0.705 F1 0.571
+  CNN          acc 0.488±0.012 P 0.496 R 0.837 F1 0.622
+  LSTM         acc 0.476±0.004 P 0.485 R 0.560 F1 0.520
+  Transformer  acc 0.466±0.010 P 0.475 R 0.544 F1 0.504
+
+== market+sentiment: train 1388 val 297 test 298; test up-rate 0.507
+  MLP          acc 0.498±0.005 P 0.503 R 0.914 F1 0.648
+  CNN          acc 0.495±0.008 P 0.501 R 0.845 F1 0.625
+  LSTM         acc 0.518±0.011 P 0.514 R 0.872 F1 0.647
+  Transformer  acc 0.495±0.011 P 0.501 R 0.783 F1 0.609
+
+Trading sim (best market+sentiment model, no costs): {'best_model': 'LSTM', 'strategy_return': 0.005113631761751142, 'buy_hold_return': -0.008877428802405172, 'days_in_market': 0.87248322147651}
+
+          setting          model   acc  prec   rec    f1  acc_std
+     market_only Majority-class 0.507 0.507 1.000 0.673    0.000
+     market_only            MLP 0.487 0.494 0.705 0.571    0.013
+     market_only            CNN 0.488 0.496 0.837 0.622    0.012
+     market_only           LSTM 0.476 0.485 0.560 0.520    0.004
+     market_only    Transformer 0.466 0.475 0.544 0.504    0.010
+market+sentiment Majority-class 0.507 0.507 1.000 0.673    0.000
+market+sentiment            MLP 0.498 0.503 0.914 0.648    0.005
+market+sentiment            CNN 0.495 0.501 0.845 0.625    0.008
+market+sentiment           LSTM 0.518 0.514 0.872 0.647    0.011
+market+sentiment    Transformer 0.495 0.501 0.783 0.609    0.011

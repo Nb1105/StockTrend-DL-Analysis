@@ -1,0 +1,6 @@
+{
+  "best_model": "LSTM",
+  "strategy_return": 0.005113631761751142,
+  "buy_hold_return": -0.008877428802405172,
+  "days_in_market": 0.87248322147651
+}

@@ -1,0 +1,23 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 20566.83it/s]
+[1mBertForSequenceClassification LOAD REPORT[0m from: ProsusAI/finbert
+Key                          | Status     |  | 
+-----------------------------+------------+--+-
+bert.embeddings.position_ids | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+/opt/homebrew/lib/python3.14/site-packages/huggingface_hub/file_download.py:722: UserWarning: Not enough free disk space to download the file. The expected file size is: 437.97 MB. The target location /Users/ashok/.cache/huggingface/hub/models--ProsusAI--finbert/blobs only has 347.68 MB free disk space.
+  warnings.warn(
+{0: 'positive', 1: 'negative', 2: 'neutral'}
+0 1989
+200 1989
+400 1989
+600 1989
+800 1989
+1000 1989
+1200 1989
+1400 1989
+1600 1989
+1800 1989
+saved /Users/ashok/Desktop/DL_Bhandu/src/../data/finbert_daily.csv

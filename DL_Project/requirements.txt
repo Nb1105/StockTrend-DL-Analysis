@@ -1,0 +1,9 @@
+numpy
+pandas
+scikit-learn
+matplotlib
+tensorflow>=2.16
+# only needed for step 2 (FinBERT sentiment extraction)
+torch
+transformers
+huggingface_hub
