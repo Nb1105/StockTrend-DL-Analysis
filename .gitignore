@@ -12,3 +12,10 @@ __pycache__/
 
 # Environment variables
 .env
+
+# Model files maintained and committed by teammates
+/DL_Project/src/models/cnn.py
+/DL_Project/src/models/mlp.py
+/DL_Project/src/models/transformers.py
+# The current project tree names this file transformer.py (singular).
+/DL_Project/src/models/transformer.py
