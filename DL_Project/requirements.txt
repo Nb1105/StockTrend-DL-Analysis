@@ -1,9 +1,11 @@
 numpy
 pandas
+scipy
 scikit-learn
 matplotlib
-tensorflow>=2.16
-# only needed for step 2 (FinBERT sentiment extraction)
+tensorflow>=2.16,<2.22
+
+# only needed to (re)compute FinBERT sentiment (src/finbert_features.py)
 torch
 transformers
 huggingface_hub

@@ -1,21 +1,40 @@
-# Virtual environments
-venv/
+# Environments
 .venv/
-DL_Project/venv/
+.venv*/
+venv/
+.venv312/
 
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
-
-# Jupyter
 .ipynb_checkpoints/
 
-# Environment variables
+# Secrets / OS
 .env
+.DS_Store
 
-# Model files maintained and committed by teammates
-/DL_Project/src/models/cnn.py
-/DL_Project/src/models/mlp.py
-/DL_Project/src/models/transformers.py
-# The current project tree names this file transformer.py (singular).
-/DL_Project/src/models/transformer.py
+# Downloaded FinBERT weights (re-created by src/finbert_features.py)
+DL_Project/models/
+
+# Run archive and logs
+DL_Project/results/history/
+*.log
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# OS junk
+Thumbs.db
+desktop.ini
+
+# Tooling caches and temp files
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.tmp
+*.bak
+
+# Raw dataset archives (CSVs in data/ are kept)
+DL_Project/data/*.zip

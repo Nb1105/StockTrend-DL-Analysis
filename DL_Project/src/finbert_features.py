@@ -4,11 +4,11 @@ Output: ../data/finbert_daily.csv (cached; re-run is a no-op)."""
 import os, re, numpy as np, pandas as pd, torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-ROOT = os.path.join(os.path.dirname(__file__), "..")
-OUT = os.path.join(ROOT, "data", "finbert_daily.csv")
+from config import ROOT, DATA_DIR
+OUT = str(DATA_DIR / "finbert_daily.csv")
 
 MODEL_ID = "ProsusAI/finbert"
-MODEL_DIR = os.path.join(ROOT, "models", "finbert")
+MODEL_DIR = str(ROOT / "models" / "finbert")
 
 def download_finbert():
     """Download the FinBERT model files once into ../models/finbert and reuse them afterwards."""
@@ -25,9 +25,9 @@ def clean(s):
 def main():
     if os.path.exists(OUT):
         print("cached:", OUT); return
-    df = pd.read_csv(os.path.join(ROOT, "data", "Combined_News_DJIA.csv"))
+    df = pd.read_csv(str(DATA_DIR / "Combined_News_DJIA.csv"))
     cols = [f"Top{i}" for i in range(1, 26)]
-    dev = "mps" if torch.backends.mps.is_available() else "cpu"
+    dev = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     path = download_finbert()
     tok = AutoTokenizer.from_pretrained(path)
     model = AutoModelForSequenceClassification.from_pretrained(path).to(dev).eval()

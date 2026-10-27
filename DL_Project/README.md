@@ -1,65 +1,69 @@
-# Stock Direction Prediction: MLP vs 1D-CNN vs LSTM vs Transformer
+# Next-Day DJIA Direction Prediction: MLP vs 1D-CNN vs LSTM vs Transformer
 
-Predicts next-day DJIA direction from market data (OHLCV) and FinBERT sentiment of Reddit headlines
-(Kaggle "Daily News for Stock Market Prediction"). Compares four Keras models, with and without sentiment.
+Predicts whether the Dow Jones Industrial Average closes up or down on the next trading day, using
+market data (OHLCV-derived features), FinBERT sentiment and TF-IDF text features of daily Reddit headlines
+(Kaggle "Daily News for Stock Market Prediction"). Four Keras architectures are compared under three
+input settings (an ablation):
 
-## Folder layout
+| Setting | Inputs |
+|---|---|
+| `market_only` | technical features from OHLCV |
+| `market+sentiment` | + FinBERT daily sentiment statistics |
+| `market+sentiment+text` | + 20 TF-IDF/SVD components of the headlines |
+
+## Project structure
 ```
-data/                 dataset CSVs + finbert_daily.csv (precomputed FinBERT sentiment)
-src/data.py           features, windowing, temporal split, metrics
-src/finbert_features.py   FinBERT sentiment extraction (optional if finbert_daily.csv exists)
-src/models/           mlp.py, cnn.py, lstm.py, transformer.py
-src/main.py           runs all four models and writes results
-src/train.py          legacy PyTorch version (not needed)
-results/              metrics, plots, trading simulation
-requirements.txt
+DL_Project/
+├── data/                    dataset CSVs + finbert_daily.csv (precomputed FinBERT sentiment)
+├── docs/                    project synopsis
+├── models_saved/            trained .keras models (seed 0 of each model/setting)
+├── results/                 latest run (overwritten each run)
+│   ├── report.html          open this: KPIs, charts, full metrics table
+│   ├── metrics.csv, trading_sim.json, run_info.json
+│   ├── accuracy_by_model.png, confusion_matrices.png
+│   ├── tuning/              validation-only search results (per model)
+│   └── history/<timestamp>/ archived copy of every run
+├── src/
+│   ├── config.py            paths, hyper-parameters, per-model input configuration
+│   ├── data.py              features, windowing, chronological split, scaling
+│   ├── models/              mlp.py, cnn.py, lstm.py, transformer.py
+│   ├── train.py             training routine (early stopping, LR schedule)
+│   ├── evaluate.py          metrics + significance test vs majority baseline
+│   ├── tune.py              validation-only configuration search
+│   ├── report.py            figures + HTML report
+│   ├── main.py              full experiment (entry point)
+│   └── finbert_features.py  FinBERT sentiment extraction (only if finbert_daily.csv is missing)
+└── requirements.txt
 ```
 
-## Run on Windows (PowerShell, from this folder)
-
-1. Install Python 3.10, 3.11 or 3.12 (TensorFlow does not support 3.13+ yet). Tick "Add Python to PATH".
-
-2. Create environment and install packages:
+## Setup (Windows, PowerShell, from this folder)
+TensorFlow supports Python 3.10 - 3.12 (not 3.13+).
 ```powershell
-python -m venv venv
-venv\Scripts\activate
+py -3.12 -m venv ..\.venv312
+..\.venv312\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
-If activation is blocked: `Set-ExecutionPolicy -Scope Process Bypass`, then activate again.
+If activation is blocked: `Set-ExecutionPolicy -Scope Process Bypass`.
 
-3. Check the data. If `data\finbert_daily.csv` exists (it should be in the zip), skip to step 5.
-   Otherwise download the dataset and compute sentiment:
+## Run
 ```powershell
-mkdir data
-curl.exe -L -o data\stocknews.zip https://www.kaggle.com/api/v1/datasets/download/aaron7sun/stocknews
-Expand-Archive data\stocknews.zip -DestinationPath data -Force
+python src\main.py                              # full experiment, 5 seeds, all models (~15-20 min on CPU)
+python src\main.py --models LSTM Transformer    # subset
+python src\main.py --seeds 3 --no-save          # faster, no .keras files
+python src\tune.py                              # optional: re-select per-model inputs on the validation split (~30 min)
+start results\report.html                       # view the results
 ```
+Every `main.py` run refreshes the files in `results/` and stores a copy in `results/history/`.
 
-4. (Only if finbert_daily.csv is missing) Extract FinBERT sentiment. Downloads about 440 MB into
-   `models\finbert`; runs on CPU, so allow a long time (about 2,000 days x 25 headlines):
-```powershell
-python src\finbert_features.py
-```
+## Method
+- Chronological 70/15/15 split; standardisation uses training data only (clipped to ±5).
+- All models are scored on the **same** test days, whatever their window length.
+- Per-model window, market feature set and loss weighting (by |next-day return|) are selected on the
+  **validation** split (`src/tune.py`); the test set is never used for selection.
+- Each model is trained with 5 seeds and the probabilities averaged; an all-model ensemble is also reported.
+- Each model is compared with the majority-class baseline using a one-sided binomial test (`p_vs_majority`).
 
-5. Train and compare all four models:
-```powershell
-python src\main.py
-```
-Options:
-```powershell
-python src\main.py --models LSTM Transformer   # only some models
-python src\main.py --seeds 3                   # fewer seeds, faster
-python src\main.py --no-save                   # do not save .keras model files
-```
-
-## Outputs
-- `results\metrics_keras.csv` : accuracy, precision, recall, F1 (mean over seeds) per model and setting
-- `results\confusion_matrices_keras.png`, `results\ablation_accuracy_keras.png`
-- `results\trading_sim_keras.json` : simple long/flat simulation vs buy-and-hold
-- `models_saved\*.keras` : trained model files
-
-## Notes
-- Split is chronological 70/15/15; normalisation uses training data only.
-- Preliminary PyTorch results: all models near chance (about 0.47 to 0.52 accuracy; majority baseline 0.507);
-  sentiment gave a small gain; LSTM + sentiment was best at 0.518.
+## Caveat
+Next-day index direction is close to a coin flip. Differences of a few accuracy points on ~290 test days are
+within sampling noise; use `p_vs_majority` and AUC, not accuracy alone, to judge whether a model has real signal.
